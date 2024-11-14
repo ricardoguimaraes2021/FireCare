@@ -1,3 +1,4 @@
+using FireCare.Forms;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -57,6 +58,23 @@ namespace FireCare
         private void btn_exit_MouseLeave(object sender, EventArgs e)
         {
             btn_exit.BackColor = SystemColors.Control;
+        }
+
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("Tem certeza de que deseja sair?", "Confirmar Logout", MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                // Fecha o formulário principal
+                this.Hide();
+
+                // Abre o LoginForm novamente
+                LoginForm loginForm = new LoginForm();
+                loginForm.ShowDialog();
+
+                // Fecha o formulário atual após a volta ao LoginForm
+                this.Close();
+            }
         }
     }
 }

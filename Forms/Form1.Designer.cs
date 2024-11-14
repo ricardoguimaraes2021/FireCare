@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             pnl_sidebar = new Panel();
+            btnLogout = new Button();
             btn_exit = new Button();
             pictureBox1 = new PictureBox();
             lbl_titulo = new Label();
@@ -38,7 +39,6 @@
             btn_profissionais = new Button();
             btn_incidentes = new Button();
             mainpanel = new Panel();
-            btnRedefinirSenha = new Button();
             pnl_sidebar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -46,7 +46,7 @@
             // pnl_sidebar
             // 
             pnl_sidebar.BackColor = Color.FromArgb(224, 224, 224);
-            pnl_sidebar.Controls.Add(btnRedefinirSenha);
+            pnl_sidebar.Controls.Add(btnLogout);
             pnl_sidebar.Controls.Add(btn_exit);
             pnl_sidebar.Controls.Add(pictureBox1);
             pnl_sidebar.Controls.Add(lbl_titulo);
@@ -59,6 +59,16 @@
             pnl_sidebar.Name = "pnl_sidebar";
             pnl_sidebar.Size = new Size(200, 678);
             pnl_sidebar.TabIndex = 0;
+            // 
+            // btnLogout
+            // 
+            btnLogout.Location = new Point(56, 536);
+            btnLogout.Name = "btnLogout";
+            btnLogout.Size = new Size(116, 23);
+            btnLogout.TabIndex = 6;
+            btnLogout.Text = "Logout";
+            btnLogout.UseVisualStyleBackColor = true;
+            btnLogout.Click += btnLogout_Click;
             // 
             // btn_exit
             // 
@@ -154,15 +164,6 @@
             mainpanel.Size = new Size(836, 678);
             mainpanel.TabIndex = 2;
             // 
-            // btnRedefinirSenha
-            // 
-            btnRedefinirSenha.Location = new Point(56, 536);
-            btnRedefinirSenha.Name = "btnRedefinirSenha";
-            btnRedefinirSenha.Size = new Size(116, 23);
-            btnRedefinirSenha.TabIndex = 6;
-            btnRedefinirSenha.Text = "Redefinir Senha";
-            btnRedefinirSenha.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -193,6 +194,6 @@
         private PictureBox pictureBox1;
         private Button btn_exit;
         private Panel mainpanel;
-        private Button btnRedefinirSenha;
+        private Button btnLogout;
     }
 }
