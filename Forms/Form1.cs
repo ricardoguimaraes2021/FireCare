@@ -76,5 +76,7 @@ namespace FireCare
                 this.Close();
             }
         }
+
+       
     }
 }
