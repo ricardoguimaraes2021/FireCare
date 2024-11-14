@@ -179,5 +179,48 @@ namespace FireCare.Services
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             return Regex.IsMatch(email, emailPattern);
         }
+
+        public Profissional Autenticar(string email, string senha)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT * FROM Profissionais WHERE Email = @Email AND Senha = @Senha";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Email", email);
+                    command.Parameters.AddWithValue("@Senha", senha);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var profissional = new Profissional(
+                                reader.GetString(reader.GetOrdinal("Nome")),
+                                reader.GetDateTime(reader.GetOrdinal("DataNascimento")),
+                                (Genero)Enum.Parse(typeof(Genero), reader.GetString(reader.GetOrdinal("Genero"))),
+                                reader.GetString(reader.GetOrdinal("Email")),
+                                reader.GetString(reader.GetOrdinal("Senha")),
+                                (TipoSanguineo)Enum.Parse(typeof(TipoSanguineo), reader.GetString(reader.GetOrdinal("TipoSanguineo"))),
+                                (CargoProfissional)Enum.Parse(typeof(CargoProfissional), reader.GetString(reader.GetOrdinal("Cargo")))
+                            )
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Disponivel = reader.GetBoolean(reader.GetOrdinal("Disponivel")),
+                                NumeroTelefone = reader.GetString(reader.GetOrdinal("NumeroTelefone")),
+                                Endereco = reader.GetString(reader.GetOrdinal("Endereco"))
+                            };
+
+                            MessageBox.Show("Autenticação bem-sucedida!");
+                            return profissional;
+                        }
+                    }
+                }
+            }
+
+            MessageBox.Show("Credenciais incorretas.");
+            return null;
+        }
     }
 }

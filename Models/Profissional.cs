@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System;
 
 namespace FireCare.Models
 {
     public class Profissional : EntidadeBase
     {
         public string Nome { get; set; }
-        public DateTime DataNascimento { get; set; } 
-        public Genero Genero { get; set; }  
-        public string Email { get; set; }  
-        public string Senha { get; set; } 
-        public TipoSanguineo TipoSanguineo { get; set; }  
-        public CargoProfissional Cargo { get; set; } 
-        public bool Disponivel { get; set; } = true; 
-        public string NumeroTelefone { get; set; }  
-        public string Endereco { get; set; }  
+        public DateTime DataNascimento { get; set; }
+        public Genero Genero { get; set; }
+        public string Email { get; set; }
+        public string Senha { get; set; }
+        public TipoSanguineo TipoSanguineo { get; set; }
+        public CargoProfissional Cargo { get; set; }
+        public bool Disponivel { get; set; } = true;
+        public string NumeroTelefone { get; set; }
+        public string Endereco { get; set; }
 
-      
+        // Construtor principal
         public Profissional(string nome, DateTime dataNascimento, Genero genero, string email, string senha, TipoSanguineo tipoSanguineo, CargoProfissional cargo)
         {
             Nome = nome;
@@ -31,7 +25,20 @@ namespace FireCare.Models
             Senha = senha;
             TipoSanguineo = tipoSanguineo;
             Cargo = cargo;
-            Disponivel = true;  
+            Disponivel = true;
+        }
+
+        // Construtor opcional que permite definir todos os valores, incluindo o estado de disponibilidade
+        public Profissional(string nome, DateTime dataNascimento, Genero genero, string email, string senha, TipoSanguineo tipoSanguineo, CargoProfissional cargo, bool disponivel)
+        {
+            Nome = nome;
+            DataNascimento = dataNascimento;
+            Genero = genero;
+            Email = email;
+            Senha = senha;
+            TipoSanguineo = tipoSanguineo;
+            Cargo = cargo;
+            Disponivel = disponivel;
         }
     }
 
@@ -61,4 +68,3 @@ namespace FireCare.Models
         Tecnico
     }
 }
-

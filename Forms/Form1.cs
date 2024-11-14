@@ -1,3 +1,7 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace FireCare
 {
     public partial class Form1 : Form
@@ -6,6 +10,7 @@ namespace FireCare
         {
             InitializeComponent();
         }
+
         public void loadform(object Form)
         {
             if (this.mainpanel.Controls.Count > 0)

@@ -30,14 +30,15 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             pnl_sidebar = new Panel();
+            btn_exit = new Button();
             pictureBox1 = new PictureBox();
             lbl_titulo = new Label();
             btn_equipamento = new Button();
             btn_painel = new Button();
             btn_profissionais = new Button();
             btn_incidentes = new Button();
-            btn_exit = new Button();
             mainpanel = new Panel();
+            btnRedefinirSenha = new Button();
             pnl_sidebar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -45,6 +46,7 @@
             // pnl_sidebar
             // 
             pnl_sidebar.BackColor = Color.FromArgb(224, 224, 224);
+            pnl_sidebar.Controls.Add(btnRedefinirSenha);
             pnl_sidebar.Controls.Add(btn_exit);
             pnl_sidebar.Controls.Add(pictureBox1);
             pnl_sidebar.Controls.Add(lbl_titulo);
@@ -57,6 +59,20 @@
             pnl_sidebar.Name = "pnl_sidebar";
             pnl_sidebar.Size = new Size(200, 678);
             pnl_sidebar.TabIndex = 0;
+            // 
+            // btn_exit
+            // 
+            btn_exit.BackColor = SystemColors.ActiveBorder;
+            btn_exit.BackgroundImageLayout = ImageLayout.Center;
+            btn_exit.Location = new Point(39, 610);
+            btn_exit.Name = "btn_exit";
+            btn_exit.Size = new Size(53, 40);
+            btn_exit.TabIndex = 0;
+            btn_exit.Text = "X";
+            btn_exit.UseVisualStyleBackColor = false;
+            btn_exit.Click += btn_exit_Click;
+            btn_exit.MouseEnter += btn_exit_MouseEnter;
+            btn_exit.MouseLeave += btn_exit_MouseLeave;
             // 
             // pictureBox1
             // 
@@ -130,20 +146,6 @@
             btn_incidentes.UseVisualStyleBackColor = true;
             btn_incidentes.Click += btn_incidentes_Click;
             // 
-            // btn_exit
-            // 
-            btn_exit.BackColor = SystemColors.ActiveBorder;
-            btn_exit.BackgroundImageLayout = ImageLayout.Center;
-            btn_exit.Location = new Point(39, 610);
-            btn_exit.Name = "btn_exit";
-            btn_exit.Size = new Size(53, 40);
-            btn_exit.TabIndex = 0;
-            btn_exit.Text = "X";
-            btn_exit.UseVisualStyleBackColor = false;
-            btn_exit.Click += btn_exit_Click;
-            btn_exit.MouseEnter += btn_exit_MouseEnter;
-            btn_exit.MouseLeave += btn_exit_MouseLeave;
-            // 
             // mainpanel
             // 
             mainpanel.Dock = DockStyle.Fill;
@@ -151,6 +153,15 @@
             mainpanel.Name = "mainpanel";
             mainpanel.Size = new Size(836, 678);
             mainpanel.TabIndex = 2;
+            // 
+            // btnRedefinirSenha
+            // 
+            btnRedefinirSenha.Location = new Point(56, 536);
+            btnRedefinirSenha.Name = "btnRedefinirSenha";
+            btnRedefinirSenha.Size = new Size(116, 23);
+            btnRedefinirSenha.TabIndex = 6;
+            btnRedefinirSenha.Text = "Redefinir Senha";
+            btnRedefinirSenha.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -182,5 +193,6 @@
         private PictureBox pictureBox1;
         private Button btn_exit;
         private Panel mainpanel;
+        private Button btnRedefinirSenha;
     }
 }

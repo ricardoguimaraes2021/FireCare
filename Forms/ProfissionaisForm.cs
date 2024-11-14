@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using System.Text;
 using FireCare.Models;
 using FireCare.Services;
 
@@ -13,27 +15,26 @@ namespace FireCare
         public ProfissionaisForm()
         {
             InitializeComponent();
-            this.Load += ProfissionaisForm_Load; // Associa o evento Load ao método ProfissionaisForm_Load
-            this.Dock = DockStyle.Fill; // Define o formulário para preencher o mainpanel
+            this.Load += ProfissionaisForm_Load;
+            this.Dock = DockStyle.Fill;
         }
 
         private void ProfissionaisForm_Load(object sender, EventArgs e)
         {
-            // Código de inicialização ao carregar o formulário
             PreencherProximoId();
             ConfigurarDateTimePicker();
             ConfigurarTxtTelefone();
             DefinirValoresPadraoComboBox();
             CarregarProfissionaisNaListView();
-            txtId.Enabled = false; // Desativa o campo ID para impedir edições manuais
-            ConfigurarEstadoInicialDosBotoes(); // Define o estado inicial dos botões
+            txtId.Enabled = false;
+            ConfigurarEstadoInicialDosBotoes();
         }
 
         private void ConfigurarEstadoInicialDosBotoes()
         {
-            btn_adicionar_profissional.Enabled = true;   // Botão Adicionar ativo
-            btn_atualizar_profissional.Enabled = false;  // Botão Atualizar inativo
-            btn_eliminar_profissional.Enabled = false;   // Botão Eliminar inativo
+            btn_adicionar_profissional.Enabled = true;
+            btn_atualizar_profissional.Enabled = false;
+            btn_eliminar_profissional.Enabled = false;
         }
 
         private void PreencherProximoId()
@@ -89,36 +90,31 @@ namespace FireCare
         {
             if (listViewProfissionais.SelectedItems.Count > 0)
             {
-                // Obter o item selecionado na ListView
                 ListViewItem item = listViewProfissionais.SelectedItems[0];
-                int profissionalId = int.Parse(item.SubItems[0].Text); // Obtém o ID do profissional a partir da primeira coluna
+                int profissionalId = int.Parse(item.SubItems[0].Text);
 
-                // Busca o profissional no banco de dados com base no ID
                 Profissional profissional = profissionalService.ObterProfissionalPorId(profissionalId);
 
                 if (profissional != null)
                 {
-                    // Preenche os campos de edição com os dados do profissional
                     txtId.Text = profissional.Id.ToString();
                     txtNome.Text = profissional.Nome;
                     dateTimePickerDataNascimento.Value = profissional.DataNascimento;
                     comboGenero.SelectedItem = profissional.Genero.ToString();
                     txtEmail.Text = profissional.Email;
-                    txtSenha.Text = profissional.Senha;
+                    txtSenha.Text = ""; // Limpa o campo de senha para não mostrar a senha encriptada
                     comboTipoSanguineo.SelectedItem = profissional.TipoSanguineo.ToString();
                     comboCargo.SelectedItem = profissional.Cargo.ToString();
                     txtTelefone.Text = profissional.NumeroTelefone;
                     txtEndereco.Text = profissional.Endereco;
 
-                    // Atualiza o estado dos botões
-                    btn_adicionar_profissional.Enabled = false;   // Desativa o botão Adicionar
-                    btn_atualizar_profissional.Enabled = true;    // Ativa o botão Atualizar
-                    btn_eliminar_profissional.Enabled = true;     // Ativa o botão Eliminar
+                    btn_adicionar_profissional.Enabled = false;
+                    btn_atualizar_profissional.Enabled = true;
+                    btn_eliminar_profissional.Enabled = true;
                 }
             }
             else
             {
-                // Configura o estado inicial dos botões se nada estiver selecionado
                 ConfigurarEstadoInicialDosBotoes();
             }
         }
@@ -127,18 +123,27 @@ namespace FireCare
         {
             try
             {
+                string senha = txtSenha.Text;
+
+                if (string.IsNullOrWhiteSpace(senha))
+                {
+                    MessageBox.Show("Por favor, insira uma senha válida.");
+                    return;
+                }
+
                 var profissional = new Profissional(
                     txtNome.Text,
                     dateTimePickerDataNascimento.Value,
                     (Genero)Enum.Parse(typeof(Genero), comboGenero.SelectedItem.ToString()),
                     txtEmail.Text,
-                    txtSenha.Text,
+                    EncriptarSenha(senha), // Encripta a senha fornecida
                     (TipoSanguineo)Enum.Parse(typeof(TipoSanguineo), comboTipoSanguineo.SelectedItem.ToString()),
                     (CargoProfissional)Enum.Parse(typeof(CargoProfissional), comboCargo.SelectedItem.ToString())
                 )
                 {
                     NumeroTelefone = txtTelefone.Text,
-                    Endereco = txtEndereco.Text
+                    Endereco = txtEndereco.Text,
+                    Disponivel = true
                 };
 
                 if (!profissionalService.ValidarEmail(profissional.Email))
@@ -152,7 +157,7 @@ namespace FireCare
                     MessageBox.Show("Profissional adicionado com sucesso!");
                     LimparCampos();
                     CarregarProfissionaisNaListView();
-                    ConfigurarEstadoInicialDosBotoes(); // Volta ao estado inicial dos botões
+                    ConfigurarEstadoInicialDosBotoes();
                 }
                 else
                 {
@@ -169,19 +174,28 @@ namespace FireCare
         {
             if (int.TryParse(txtId.Text, out int profissionalId))
             {
+                string senha = txtSenha.Text;
+
+                if (string.IsNullOrWhiteSpace(senha))
+                {
+                    MessageBox.Show("Por favor, insira uma senha válida.");
+                    return;
+                }
+
                 var profissional = new Profissional(
                     txtNome.Text,
                     dateTimePickerDataNascimento.Value,
                     (Genero)Enum.Parse(typeof(Genero), comboGenero.SelectedItem.ToString()),
                     txtEmail.Text,
-                    txtSenha.Text,
+                    EncriptarSenha(senha), // Encripta a senha fornecida
                     (TipoSanguineo)Enum.Parse(typeof(TipoSanguineo), comboTipoSanguineo.SelectedItem.ToString()),
                     (CargoProfissional)Enum.Parse(typeof(CargoProfissional), comboCargo.SelectedItem.ToString())
                 )
                 {
                     Id = profissionalId,
                     NumeroTelefone = txtTelefone.Text,
-                    Endereco = txtEndereco.Text
+                    Endereco = txtEndereco.Text,
+                    Disponivel = true
                 };
 
                 if (profissionalService.AtualizarProfissional(profissional))
@@ -189,7 +203,7 @@ namespace FireCare
                     MessageBox.Show("Dados atualizados com sucesso!");
                     CarregarProfissionaisNaListView();
                     LimparCampos();
-                    ConfigurarEstadoInicialDosBotoes(); // Volta ao estado inicial dos botões
+                    ConfigurarEstadoInicialDosBotoes();
                 }
                 else
                 {
@@ -210,7 +224,7 @@ namespace FireCare
                         MessageBox.Show("Profissional excluído com sucesso!");
                         CarregarProfissionaisNaListView();
                         LimparCampos();
-                        ConfigurarEstadoInicialDosBotoes(); // Volta ao estado inicial dos botões
+                        ConfigurarEstadoInicialDosBotoes();
                     }
                     else
                     {
@@ -232,6 +246,20 @@ namespace FireCare
             comboTipoSanguineo.SelectedIndex = 0;
             comboCargo.SelectedIndex = 0;
             PreencherProximoId();
+        }
+
+        private static string EncriptarSenha(string senha)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(senha));
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
     }
 }
