@@ -52,12 +52,12 @@
             label5 = new Label();
             label6 = new Label();
             label7 = new Label();
-            webViewMapa = new Microsoft.Web.WebView2.WinForms.WebView2();
+            WebView2Control = new Microsoft.Web.WebView2.WinForms.WebView2();
             btnExcluirOcorrencia = new Button();
             btnEditarOcorrencia = new Button();
             label8 = new Label();
             timerHora = new System.Windows.Forms.Timer(components);
-            ((System.ComponentModel.ISupportInitialize)webViewMapa).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)WebView2Control).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -225,16 +225,17 @@
             label7.TabIndex = 16;
             label7.Text = "Estado";
             // 
-            // webViewMapa
+            // WebView2Control
             // 
-            webViewMapa.AllowExternalDrop = true;
-            webViewMapa.CreationProperties = null;
-            webViewMapa.DefaultBackgroundColor = Color.White;
-            webViewMapa.Location = new Point(574, 74);
-            webViewMapa.Name = "webViewMapa";
-            webViewMapa.Size = new Size(214, 334);
-            webViewMapa.TabIndex = 17;
-            webViewMapa.ZoomFactor = 1D;
+            WebView2Control.AllowExternalDrop = true;
+            WebView2Control.CreationProperties = null;
+            WebView2Control.DefaultBackgroundColor = Color.White;
+            WebView2Control.Location = new Point(574, 74);
+            WebView2Control.Name = "WebView2Control";
+            WebView2Control.Size = new Size(214, 334);
+            WebView2Control.TabIndex = 17;
+            WebView2Control.ZoomFactor = 1D;
+
             // 
             // btnExcluirOcorrencia
             // 
@@ -242,9 +243,9 @@
             btnExcluirOcorrencia.Name = "btnExcluirOcorrencia";
             btnExcluirOcorrencia.Size = new Size(75, 23);
             btnExcluirOcorrencia.TabIndex = 18;
-            btnExcluirOcorrencia.Text = "Editar";
+            btnExcluirOcorrencia.Text = "Eliminar";
             btnExcluirOcorrencia.UseVisualStyleBackColor = true;
-            btnExcluirOcorrencia.Click += btnEditarOcorrencia_Click;
+       
             // 
             // btnEditarOcorrencia
             // 
@@ -252,9 +253,9 @@
             btnEditarOcorrencia.Name = "btnEditarOcorrencia";
             btnEditarOcorrencia.Size = new Size(75, 23);
             btnEditarOcorrencia.TabIndex = 19;
-            btnEditarOcorrencia.Text = "Eliminar";
+            btnEditarOcorrencia.Text = "Editar";
             btnEditarOcorrencia.UseVisualStyleBackColor = true;
-            btnEditarOcorrencia.Click += btnExcluirOcorrencia_Click;
+        
             // 
             // label8
             // 
@@ -273,7 +274,7 @@
             Controls.Add(label8);
             Controls.Add(btnEditarOcorrencia);
             Controls.Add(btnExcluirOcorrencia);
-            Controls.Add(webViewMapa);
+            Controls.Add(WebView2Control);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(label5);
@@ -294,7 +295,7 @@
             FormBorderStyle = FormBorderStyle.None;
             Name = "IncidentesForm";
             Text = "IncidentesForm";
-            ((System.ComponentModel.ISupportInitialize)webViewMapa).EndInit();
+            ((System.ComponentModel.ISupportInitialize)WebView2Control).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -318,7 +319,7 @@
         private Label label5;
         private Label label6;
         private Label label7;
-        private Microsoft.Web.WebView2.WinForms.WebView2 webViewMapa;
+        private Microsoft.Web.WebView2.WinForms.WebView2 WebView2Control;
         private Button btnExcluirOcorrencia;
         private Button btnEditarOcorrencia;
         private ColumnHeader ID;

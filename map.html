@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Map Viewer</title>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    body { margin: 0; padding: 0; }
-    #map { width: 100vw; height: 100vh; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 100vh;
+            background-color: lightgray;
+        }
+    </style>
 </head>
 <body>
-  <div id="map"></div>
-  <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY3JpbGx5IiwiYSI6ImNtM2hzejZ1YzBrajYycXNkcHRuNWE0NjUifQ.sUNl_z6_iF2suoLHBWsE8g';
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const latitude = parseFloat(urlParams.get('lat')) || 0;
-    const longitude = parseFloat(urlParams.get('lng')) || 0;
-    
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [longitude, latitude],
-      zoom: 12
-    });
+    <div id="map">Click anywhere on the map</div>
 
-    new mapboxgl.Marker()
-      .setLngLat([longitude, latitude])
-      .addTo(map);
-  </script>
+    <script>
+        const map = document.getElementById("map");
+
+        map.addEventListener("click", function (event) {
+            const rect = map.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Example: Convert click positions to coordinates
+            const longitude = (x / rect.width) * 360 - 180;
+            const latitude = 90 - (y / rect.height) * 180;
+
+            // Send the coordinates to the host application
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ latitude, longitude });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -163,7 +163,7 @@
             mainpanel.Name = "mainpanel";
             mainpanel.Size = new Size(836, 678);
             mainpanel.TabIndex = 2;
-
+            mainpanel.Paint += mainpanel_Paint;
             // 
             // Form1
             // 

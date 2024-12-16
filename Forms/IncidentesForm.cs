@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using FireCare.Models;
 using FireCare.Services;
@@ -16,7 +17,7 @@ namespace FireCare
             this.Load += IncidentesForm_Load;
         }
 
-        private void IncidentesForm_Load(object sender, EventArgs e)
+        private async void IncidentesForm_Load(object sender, EventArgs e)
         {
             CarregarSeveridades();
             CarregarEstados();
@@ -24,6 +25,7 @@ namespace FireCare
             CarregarOcorrenciasNaListView();
             ConfigurarEstadoInicialDosBotoes();
             ConfigurarTimerHora();
+            await InicializarWebView2();
         }
 
         private void CarregarSeveridades()
@@ -146,61 +148,27 @@ namespace FireCare
             }
         }
 
-        private void btnEditarOcorrencia_Click(object sender, EventArgs e)
+        private async System.Threading.Tasks.Task InicializarWebView2()
         {
-            if (listViewOcorrencias.SelectedItems.Count > 0)
+            try
             {
-                ListViewItem item = listViewOcorrencias.SelectedItems[0];
-                int ocorrenciaId = int.Parse(item.Text);
-
-                var ocorrencia = new Ocorrencia
-                {
-                    Id = ocorrenciaId,
-                    Descricao = txtDescricao.Text,
-                    Localizacao = txtLocalizacao.Text,
-                    Latitude = txtLatitude.Text,
-                    Longitude = txtLongitude.Text,
-                    DataHora = DateTime.Now,
-                    Severidade = (SeveridadeOcorrencia)Enum.Parse(typeof(SeveridadeOcorrencia), comboSeveridade.SelectedItem.ToString()),
-                    Estado = (EstadoOcorrencia)Enum.Parse(typeof(EstadoOcorrencia), comboEstado.SelectedItem.ToString()),
-                    Tipo = (TipodeOcorrencia)Enum.Parse(typeof(TipodeOcorrencia), comboTipo.SelectedItem.ToString())
-                };
-
-                if (ocorrenciaService.AtualizarOcorrencia(ocorrencia))
-                {
-                    MessageBox.Show("Ocorrência atualizada com sucesso!");
-                    LimparCampos();
-                    CarregarOcorrenciasNaListView();
-                }
-                else
-                {
-                    MessageBox.Show("Erro ao atualizar ocorrência.");
-                }
+                await WebView2Control.EnsureCoreWebView2Async(null);
+                WebView2Control.Source = new Uri(Path.Combine(Application.StartupPath, "map.html"));
+                WebView2Control.WebMessageReceived += WebView2Control_WebMessageReceived;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao inicializar WebView2: {ex.Message}");
             }
         }
 
-        private void btnExcluirOcorrencia_Click(object sender, EventArgs e)
+        private void WebView2Control_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
         {
-            if (listViewOcorrencias.SelectedItems.Count > 0)
-            {
-                ListViewItem item = listViewOcorrencias.SelectedItems[0];
-                int ocorrenciaId = int.Parse(item.Text);
+            var message = e.WebMessageAsJson;
+            var coordinates = System.Text.Json.JsonSerializer.Deserialize<Coordinates>(message);
 
-                var confirmResult = MessageBox.Show("Tem certeza de que deseja excluir esta ocorrência?", "Confirmação", MessageBoxButtons.YesNo);
-                if (confirmResult == DialogResult.Yes)
-                {
-                    if (ocorrenciaService.EliminarOcorrencia(ocorrenciaId))
-                    {
-                        MessageBox.Show("Ocorrência excluída com sucesso!");
-                        LimparCampos();
-                        CarregarOcorrenciasNaListView();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Erro ao excluir ocorrência.");
-                    }
-                }
-            }
+            txtLatitude.Text = coordinates.latitude.ToString();
+            txtLongitude.Text = coordinates.longitude.ToString();
         }
 
         private void LimparCampos()
@@ -213,6 +181,12 @@ namespace FireCare
             comboEstado.SelectedIndex = 0;
             comboTipo.SelectedIndex = 0;
             ConfigurarEstadoInicialDosBotoes();
+        }
+
+        private class Coordinates
+        {
+            public double latitude { get; set; }
+            public double longitude { get; set; }
         }
     }
 }

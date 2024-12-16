@@ -77,6 +77,9 @@ namespace FireCare
             }
         }
 
-       
+        private void mainpanel_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
