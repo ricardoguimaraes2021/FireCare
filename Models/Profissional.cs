@@ -15,6 +15,12 @@ namespace FireCare.Models
         public string NumeroTelefone { get; set; }
         public string Endereco { get; set; }
 
+        // Propriedade para armazenar o ID da Ocorrência à qual o profissional está associado
+        public int? OcorrenciaId { get; set; }
+
+        // Construtor padrão (sem argumentos)
+        public Profissional() { }
+
         // Construtor principal
         public Profissional(string nome, DateTime dataNascimento, Genero genero, string email, string senha, TipoSanguineo tipoSanguineo, CargoProfissional cargo)
         {

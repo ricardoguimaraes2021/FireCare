@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Linq;
 using FireCare.Models;
 
 namespace FireCare.Services
@@ -8,6 +9,7 @@ namespace FireCare.Services
     public class OcorrenciaServico
     {
         private readonly string connectionString = "Data Source=C:\\Users\\Ricardo\\source\\repos\\FireCare\\DB\\database_firecare.db;Version=3;";
+        private readonly ProfissionalServico profissionalService = new ProfissionalServico();
 
         public bool AdicionarOcorrencia(Ocorrencia ocorrencia)
         {
@@ -29,7 +31,15 @@ namespace FireCare.Services
                     command.Parameters.AddWithValue("@Estado", ocorrencia.Estado.ToString());
                     command.Parameters.AddWithValue("@Tipo", ocorrencia.Tipo.ToString());
 
-                    return command.ExecuteNonQuery() > 0;
+                    bool resultado = command.ExecuteNonQuery() > 0;
+
+                    if (resultado)
+                    {
+                        int ocorrenciaId = (int)connection.LastInsertRowId;
+                        AlocarProfissionais(ocorrenciaId, ocorrencia.Severidade);
+                    }
+
+                    return resultado;
                 }
             }
         }
@@ -47,8 +57,7 @@ namespace FireCare.Services
                                  DataHora = @DataHora, 
                                  Severidade = @Severidade, 
                                  Estado = @Estado, 
-                                 Tipo = @Tipo,
-                                 UltimaAtualizacao = CURRENT_TIMESTAMP 
+                                 Tipo = @Tipo
                                  WHERE Id = @Id";
 
                 using (SQLiteCommand command = new SQLiteCommand(query, connection))
@@ -63,13 +72,22 @@ namespace FireCare.Services
                     command.Parameters.AddWithValue("@Tipo", ocorrencia.Tipo.ToString());
                     command.Parameters.AddWithValue("@Id", ocorrencia.Id);
 
-                    return command.ExecuteNonQuery() > 0;
+                    bool resultado = command.ExecuteNonQuery() > 0;
+
+                    if (resultado && ocorrencia.Estado == EstadoOcorrencia.Resolvido)
+                    {
+                        LiberarProfissionais(ocorrencia.Id);
+                    }
+
+                    return resultado;
                 }
             }
         }
 
         public bool EliminarOcorrencia(int id)
         {
+            LiberarProfissionais(id);
+
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -149,6 +167,94 @@ namespace FireCare.Services
             }
 
             return ocorrencias;
+        }
+
+        // NOVO MÉTODO: Obter o número de profissionais alocados a uma ocorrência
+        public int ObterNumeroProfissionaisAlocados(int ocorrenciaId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = @"SELECT COUNT(*) FROM Ocorrencias_Profissionais WHERE OcorrenciaId = @OcorrenciaId";
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@OcorrenciaId", ocorrenciaId);
+                    return Convert.ToInt32(command.ExecuteScalar());
+                }
+            }
+        }
+
+        private void AlocarProfissionais(int ocorrenciaId, SeveridadeOcorrencia severidade)
+        {
+            List<Profissional> disponiveis = profissionalService.ObterTodosProfissionais().Where(p => p.Disponivel).ToList();
+
+            int quantidade = severidade == SeveridadeOcorrencia.Alta ? 5 :
+                             severidade == SeveridadeOcorrencia.Media ? 3 : 1;
+
+            for (int i = 0; i < quantidade && i < disponiveis.Count; i++)
+            {
+                Profissional profissional = disponiveis[i];
+                profissional.Disponivel = false;
+
+                profissionalService.AtualizarProfissional(profissional);
+
+                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = @"INSERT INTO Ocorrencias_Profissionais (OcorrenciaId, ProfissionalId) 
+                                     VALUES (@OcorrenciaId, @ProfissionalId)";
+
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@OcorrenciaId", ocorrenciaId);
+                        command.Parameters.AddWithValue("@ProfissionalId", profissional.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private void LiberarProfissionais(int ocorrenciaId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                string query = @"SELECT ProfissionalId FROM Ocorrencias_Profissionais WHERE OcorrenciaId = @OcorrenciaId";
+
+                List<int> profissionaisIds = new List<int>();
+
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@OcorrenciaId", ocorrenciaId);
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            profissionaisIds.Add(reader.GetInt32(0));
+                        }
+                    }
+                }
+
+                foreach (int profissionalId in profissionaisIds)
+                {
+                    Profissional profissional = profissionalService.ObterProfissionalPorId(profissionalId);
+                    if (profissional != null)
+                    {
+                        profissional.Disponivel = true;
+                        profissionalService.AtualizarProfissional(profissional);
+                    }
+                }
+
+                // Remover relação de profissionais da tabela Ocorrencias_Profissionais
+                string deleteQuery = "DELETE FROM Ocorrencias_Profissionais WHERE OcorrenciaId = @OcorrenciaId";
+
+                using (SQLiteCommand command = new SQLiteCommand(deleteQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@OcorrenciaId", ocorrenciaId);
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

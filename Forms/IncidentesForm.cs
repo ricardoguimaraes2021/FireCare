@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using FireCare.Models;
 using FireCare.Services;
@@ -10,6 +10,7 @@ namespace FireCare
     public partial class IncidentesForm : Form
     {
         private readonly OcorrenciaServico ocorrenciaService = new OcorrenciaServico();
+        private readonly ProfissionalServico profissionalService = new ProfissionalServico();
 
         public IncidentesForm()
         {
@@ -17,15 +18,41 @@ namespace FireCare
             this.Load += IncidentesForm_Load;
         }
 
-        private async void IncidentesForm_Load(object sender, EventArgs e)
+        private void IncidentesForm_Load(object sender, EventArgs e)
         {
+            ConfigurarListViewOcorrencias();
             CarregarSeveridades();
             CarregarEstados();
             CarregarTipos();
             CarregarOcorrenciasNaListView();
             ConfigurarEstadoInicialDosBotoes();
             ConfigurarTimerHora();
-            await InicializarWebView2();
+
+            // Vincular eventos
+            btnAdicionarOcorrencia.Click += btnAdicionarOcorrencia_Click;
+            btnEditarOcorrencia.Click += btnEditarOcorrencia_Click;
+            btnExcluirOcorrencia.Click += btnExcluirOcorrencia_Click;
+            listViewOcorrencias.SelectedIndexChanged += listViewOcorrencias_SelectedIndexChanged;
+        }
+
+        private void ConfigurarListViewOcorrencias()
+        {
+            listViewOcorrencias.View = View.Details;
+            listViewOcorrencias.FullRowSelect = true;
+            listViewOcorrencias.GridLines = true;
+            listViewOcorrencias.Columns.Clear();
+
+            // Combina as colunas das duas ListViews originais
+            listViewOcorrencias.Columns.Add("ID", 50);
+            listViewOcorrencias.Columns.Add("Descrição", 150);
+            listViewOcorrencias.Columns.Add("Localização", 150);
+            listViewOcorrencias.Columns.Add("Latitude", 100);
+            listViewOcorrencias.Columns.Add("Longitude", 100);
+            listViewOcorrencias.Columns.Add("Data/Hora", 120);
+            listViewOcorrencias.Columns.Add("Severidade", 100);
+            listViewOcorrencias.Columns.Add("Estado", 100);
+            listViewOcorrencias.Columns.Add("Tipo", 100);
+            listViewOcorrencias.Columns.Add("Profissionais Alocados", 150); // Mostra a quantidade de profissionais alocados
         }
 
         private void CarregarSeveridades()
@@ -64,7 +91,7 @@ namespace FireCare
 
             foreach (var ocorrencia in ocorrencias)
             {
-                ListViewItem item = new ListViewItem(ocorrencia.Id.ToString()); // ID da ocorrência
+                ListViewItem item = new ListViewItem(ocorrencia.Id.ToString());
                 item.SubItems.Add(ocorrencia.Descricao);
                 item.SubItems.Add(ocorrencia.Localizacao);
                 item.SubItems.Add(ocorrencia.Latitude);
@@ -73,6 +100,9 @@ namespace FireCare
                 item.SubItems.Add(ocorrencia.Severidade.ToString());
                 item.SubItems.Add(ocorrencia.Estado.ToString());
                 item.SubItems.Add(ocorrencia.Tipo.ToString());
+
+                int numeroProfissionais = ocorrenciaService.ObterNumeroProfissionaisAlocados(ocorrencia.Id);
+                item.SubItems.Add($"{numeroProfissionais} profissionais");
 
                 listViewOcorrencias.Items.Add(item);
             }
@@ -83,6 +113,88 @@ namespace FireCare
             btnAdicionarOcorrencia.Enabled = true;
             btnEditarOcorrencia.Enabled = false;
             btnExcluirOcorrencia.Enabled = false;
+        }
+
+        private void btnAdicionarOcorrencia_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var ocorrencia = new Ocorrencia
+                {
+                    Descricao = txtDescricao.Text,
+                    Localizacao = txtLocalizacao.Text,
+                    Latitude = txtLatitude.Text,
+                    Longitude = txtLongitude.Text,
+                    DataHora = DateTime.Now,
+                    Severidade = (SeveridadeOcorrencia)Enum.Parse(typeof(SeveridadeOcorrencia), comboSeveridade.SelectedItem.ToString()),
+                    Estado = (EstadoOcorrencia)Enum.Parse(typeof(EstadoOcorrencia), comboEstado.SelectedItem.ToString()),
+                    Tipo = (TipodeOcorrencia)Enum.Parse(typeof(TipodeOcorrencia), comboTipo.SelectedItem.ToString())
+                };
+
+                if (ocorrenciaService.AdicionarOcorrencia(ocorrencia))
+                {
+                    MessageBox.Show("Ocorrência adicionada com sucesso!");
+                    CarregarOcorrenciasNaListView();
+                }
+                else
+                {
+                    MessageBox.Show("Erro ao adicionar a ocorrência.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao processar os dados: " + ex.Message);
+            }
+        }
+
+        private void btnEditarOcorrencia_Click(object sender, EventArgs e)
+        {
+            if (listViewOcorrencias.SelectedItems.Count > 0)
+            {
+                ListViewItem item = listViewOcorrencias.SelectedItems[0];
+                int ocorrenciaId = int.Parse(item.Text);
+
+                Ocorrencia ocorrencia = ocorrenciaService.ObterOcorrenciaPorId(ocorrenciaId);
+                if (ocorrencia != null)
+                {
+                    ocorrencia.Descricao = txtDescricao.Text;
+                    ocorrencia.Localizacao = txtLocalizacao.Text;
+                    ocorrencia.Latitude = txtLatitude.Text;
+                    ocorrencia.Longitude = txtLongitude.Text;
+                    ocorrencia.Severidade = (SeveridadeOcorrencia)Enum.Parse(typeof(SeveridadeOcorrencia), comboSeveridade.SelectedItem.ToString());
+                    ocorrencia.Estado = (EstadoOcorrencia)Enum.Parse(typeof(EstadoOcorrencia), comboEstado.SelectedItem.ToString());
+                    ocorrencia.Tipo = (TipodeOcorrencia)Enum.Parse(typeof(TipodeOcorrencia), comboTipo.SelectedItem.ToString());
+
+                    if (ocorrenciaService.AtualizarOcorrencia(ocorrencia))
+                    {
+                        MessageBox.Show("Ocorrência atualizada com sucesso!");
+                        CarregarOcorrenciasNaListView();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erro ao atualizar a ocorrência.");
+                    }
+                }
+            }
+        }
+
+        private void btnExcluirOcorrencia_Click(object sender, EventArgs e)
+        {
+            if (listViewOcorrencias.SelectedItems.Count > 0)
+            {
+                ListViewItem item = listViewOcorrencias.SelectedItems[0];
+                int ocorrenciaId = int.Parse(item.Text);
+
+                if (ocorrenciaService.EliminarOcorrencia(ocorrenciaId))
+                {
+                    MessageBox.Show("Ocorrência excluída com sucesso!");
+                    CarregarOcorrenciasNaListView();
+                }
+                else
+                {
+                    MessageBox.Show("Erro ao excluir a ocorrência.");
+                }
+            }
         }
 
         private void listViewOcorrencias_SelectedIndexChanged(object sender, EventArgs e)
@@ -111,64 +223,9 @@ namespace FireCare
             }
             else
             {
+                LimparCampos();
                 ConfigurarEstadoInicialDosBotoes();
             }
-        }
-
-        private void btnAdicionarOcorrencia_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var ocorrencia = new Ocorrencia
-                {
-                    Descricao = txtDescricao.Text,
-                    Localizacao = txtLocalizacao.Text,
-                    Latitude = txtLatitude.Text,
-                    Longitude = txtLongitude.Text,
-                    DataHora = DateTime.Now,
-                    Severidade = (SeveridadeOcorrencia)Enum.Parse(typeof(SeveridadeOcorrencia), comboSeveridade.SelectedItem.ToString()),
-                    Estado = (EstadoOcorrencia)Enum.Parse(typeof(EstadoOcorrencia), comboEstado.SelectedItem.ToString()),
-                    Tipo = (TipodeOcorrencia)Enum.Parse(typeof(TipodeOcorrencia), comboTipo.SelectedItem.ToString())
-                };
-
-                if (ocorrenciaService.AdicionarOcorrencia(ocorrencia))
-                {
-                    MessageBox.Show("Ocorrência adicionada com sucesso!");
-                    LimparCampos();
-                    CarregarOcorrenciasNaListView();
-                }
-                else
-                {
-                    MessageBox.Show("Erro ao adicionar ocorrência.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao processar os dados: " + ex.Message);
-            }
-        }
-
-        private async System.Threading.Tasks.Task InicializarWebView2()
-        {
-            try
-            {
-                await WebView2Control.EnsureCoreWebView2Async(null);
-                WebView2Control.Source = new Uri(Path.Combine(Application.StartupPath, "map.html"));
-                WebView2Control.WebMessageReceived += WebView2Control_WebMessageReceived;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao inicializar WebView2: {ex.Message}");
-            }
-        }
-
-        private void WebView2Control_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
-        {
-            var message = e.WebMessageAsJson;
-            var coordinates = System.Text.Json.JsonSerializer.Deserialize<Coordinates>(message);
-
-            txtLatitude.Text = coordinates.latitude.ToString();
-            txtLongitude.Text = coordinates.longitude.ToString();
         }
 
         private void LimparCampos()
@@ -181,12 +238,6 @@ namespace FireCare
             comboEstado.SelectedIndex = 0;
             comboTipo.SelectedIndex = 0;
             ConfigurarEstadoInicialDosBotoes();
-        }
-
-        private class Coordinates
-        {
-            public double latitude { get; set; }
-            public double longitude { get; set; }
         }
     }
 }

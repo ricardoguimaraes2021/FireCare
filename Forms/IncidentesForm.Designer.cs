@@ -52,12 +52,10 @@
             label5 = new Label();
             label6 = new Label();
             label7 = new Label();
-            WebView2Control = new Microsoft.Web.WebView2.WinForms.WebView2();
             btnExcluirOcorrencia = new Button();
             btnEditarOcorrencia = new Button();
             label8 = new Label();
             timerHora = new System.Windows.Forms.Timer(components);
-            ((System.ComponentModel.ISupportInitialize)WebView2Control).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -74,11 +72,10 @@
             listViewOcorrencias.Columns.AddRange(new ColumnHeader[] { ID, Localizacao, Severidade, Estado, Tipo, columnHeader1 });
             listViewOcorrencias.Location = new Point(82, 39);
             listViewOcorrencias.Name = "listViewOcorrencias";
-            listViewOcorrencias.Size = new Size(453, 130);
+            listViewOcorrencias.Size = new Size(837, 377);
             listViewOcorrencias.TabIndex = 1;
             listViewOcorrencias.UseCompatibleStateImageBehavior = false;
             listViewOcorrencias.View = View.Details;
-            listViewOcorrencias.SelectedIndexChanged += listViewOcorrencias_SelectedIndexChanged;
             // 
             // ID
             // 
@@ -102,38 +99,37 @@
             // 
             // btnAdicionarOcorrencia
             // 
-            btnAdicionarOcorrencia.Location = new Point(109, 385);
+            btnAdicionarOcorrencia.Location = new Point(128, 639);
             btnAdicionarOcorrencia.Name = "btnAdicionarOcorrencia";
             btnAdicionarOcorrencia.Size = new Size(75, 23);
             btnAdicionarOcorrencia.TabIndex = 2;
             btnAdicionarOcorrencia.Text = "Adicionar";
             btnAdicionarOcorrencia.UseVisualStyleBackColor = true;
-            btnAdicionarOcorrencia.Click += btnAdicionarOcorrencia_Click;
             // 
             // txtDescricao
             // 
-            txtDescricao.Location = new Point(82, 198);
+            txtDescricao.Location = new Point(101, 452);
             txtDescricao.Name = "txtDescricao";
             txtDescricao.Size = new Size(308, 23);
             txtDescricao.TabIndex = 3;
             // 
             // txtLocalizacao
             // 
-            txtLocalizacao.Location = new Point(88, 249);
+            txtLocalizacao.Location = new Point(107, 503);
             txtLocalizacao.Name = "txtLocalizacao";
             txtLocalizacao.Size = new Size(100, 23);
             txtLocalizacao.TabIndex = 4;
             // 
             // txtLatitude
             // 
-            txtLatitude.Location = new Point(87, 302);
+            txtLatitude.Location = new Point(106, 556);
             txtLatitude.Name = "txtLatitude";
             txtLatitude.Size = new Size(100, 23);
             txtLatitude.TabIndex = 5;
             // 
             // txtLongitude
             // 
-            txtLongitude.Location = new Point(88, 344);
+            txtLongitude.Location = new Point(107, 598);
             txtLongitude.Name = "txtLongitude";
             txtLongitude.Size = new Size(100, 23);
             txtLongitude.TabIndex = 6;
@@ -141,7 +137,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(14, 252);
+            label2.Location = new Point(33, 506);
             label2.Name = "label2";
             label2.Size = new Size(68, 15);
             label2.TabIndex = 7;
@@ -150,7 +146,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(17, 313);
+            label3.Location = new Point(36, 567);
             label3.Name = "label3";
             label3.Size = new Size(50, 15);
             label3.TabIndex = 8;
@@ -159,7 +155,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(21, 352);
+            label4.Location = new Point(40, 606);
             label4.Name = "label4";
             label4.Size = new Size(61, 15);
             label4.TabIndex = 9;
@@ -168,7 +164,7 @@
             // labelHora
             // 
             labelHora.AutoSize = true;
-            labelHora.Location = new Point(606, 53);
+            labelHora.Location = new Point(18, 39);
             labelHora.Name = "labelHora";
             labelHora.Size = new Size(33, 15);
             labelHora.TabIndex = 10;
@@ -177,7 +173,7 @@
             // comboSeveridade
             // 
             comboSeveridade.FormattingEnabled = true;
-            comboSeveridade.Location = new Point(428, 258);
+            comboSeveridade.Location = new Point(447, 512);
             comboSeveridade.Name = "comboSeveridade";
             comboSeveridade.Size = new Size(121, 23);
             comboSeveridade.TabIndex = 11;
@@ -185,7 +181,7 @@
             // comboEstado
             // 
             comboEstado.FormattingEnabled = true;
-            comboEstado.Location = new Point(432, 314);
+            comboEstado.Location = new Point(451, 568);
             comboEstado.Name = "comboEstado";
             comboEstado.Size = new Size(121, 23);
             comboEstado.TabIndex = 12;
@@ -193,7 +189,7 @@
             // comboTipo
             // 
             comboTipo.FormattingEnabled = true;
-            comboTipo.Location = new Point(432, 362);
+            comboTipo.Location = new Point(451, 616);
             comboTipo.Name = "comboTipo";
             comboTipo.Size = new Size(121, 23);
             comboTipo.TabIndex = 13;
@@ -201,7 +197,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(395, 365);
+            label5.Location = new Point(414, 619);
             label5.Name = "label5";
             label5.Size = new Size(31, 15);
             label5.TabIndex = 14;
@@ -210,7 +206,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(361, 266);
+            label6.Location = new Point(380, 520);
             label6.Name = "label6";
             label6.Size = new Size(61, 15);
             label6.TabIndex = 15;
@@ -219,48 +215,35 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(384, 322);
+            label7.Location = new Point(403, 576);
             label7.Name = "label7";
             label7.Size = new Size(42, 15);
             label7.TabIndex = 16;
             label7.Text = "Estado";
             // 
-            // WebView2Control
-            // 
-            WebView2Control.AllowExternalDrop = true;
-            WebView2Control.CreationProperties = null;
-            WebView2Control.DefaultBackgroundColor = Color.White;
-            WebView2Control.Location = new Point(574, 74);
-            WebView2Control.Name = "WebView2Control";
-            WebView2Control.Size = new Size(214, 334);
-            WebView2Control.TabIndex = 17;
-            WebView2Control.ZoomFactor = 1D;
-
-            // 
             // btnExcluirOcorrencia
             // 
-            btnExcluirOcorrencia.Location = new Point(236, 399);
+            btnExcluirOcorrencia.Location = new Point(255, 653);
             btnExcluirOcorrencia.Name = "btnExcluirOcorrencia";
             btnExcluirOcorrencia.Size = new Size(75, 23);
             btnExcluirOcorrencia.TabIndex = 18;
             btnExcluirOcorrencia.Text = "Eliminar";
             btnExcluirOcorrencia.UseVisualStyleBackColor = true;
-       
             // 
             // btnEditarOcorrencia
             // 
-            btnEditarOcorrencia.Location = new Point(359, 407);
+            btnEditarOcorrencia.Location = new Point(378, 661);
             btnEditarOcorrencia.Name = "btnEditarOcorrencia";
             btnEditarOcorrencia.Size = new Size(75, 23);
             btnEditarOcorrencia.TabIndex = 19;
             btnEditarOcorrencia.Text = "Editar";
             btnEditarOcorrencia.UseVisualStyleBackColor = true;
-        
+            btnEditarOcorrencia.Click += btnEditarOcorrencia_Click;
             // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(18, 201);
+            label8.Location = new Point(37, 455);
             label8.Name = "label8";
             label8.Size = new Size(58, 15);
             label8.TabIndex = 20;
@@ -270,11 +253,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1398, 696);
             Controls.Add(label8);
             Controls.Add(btnEditarOcorrencia);
             Controls.Add(btnExcluirOcorrencia);
-            Controls.Add(WebView2Control);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(label5);
@@ -295,7 +277,6 @@
             FormBorderStyle = FormBorderStyle.None;
             Name = "IncidentesForm";
             Text = "IncidentesForm";
-            ((System.ComponentModel.ISupportInitialize)WebView2Control).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -319,7 +300,6 @@
         private Label label5;
         private Label label6;
         private Label label7;
-        private Microsoft.Web.WebView2.WinForms.WebView2 WebView2Control;
         private Button btnExcluirOcorrencia;
         private Button btnEditarOcorrencia;
         private ColumnHeader ID;
